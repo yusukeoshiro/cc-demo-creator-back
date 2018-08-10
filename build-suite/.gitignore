@@ -1,0 +1,16 @@
+#Exclude everything that is generated
+output
+exports
+node_modules
+
+#Exclude IDE related project configurations
+.project
+.idea
+.editorconfig
+.vscode
+
+#Exclude all existing configurations (except sample)
+build/*
+!build/config.json.*
+!build/sitegenesis-sample.*
+!build/sfra-sample.*

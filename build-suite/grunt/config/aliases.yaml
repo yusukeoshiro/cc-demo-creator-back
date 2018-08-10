@@ -1,0 +1,63 @@
+# Yaml Parser:  http://yaml-online-parser.appspot.com/
+build:
+- 'clean:build'
+- 'dw_checkout'
+- 'dw_npm_execute'
+- 'dw_copy'
+- 'dw_insert_buildinfo'
+- 'sass:build'
+- 'postcss:build'
+- 'browserify:build'
+- 'dw_optimize'
+- 'dw_merge'
+- 'dw_compress:code'
+upload:
+- 'dw_upload:code'
+activate:
+- 'dw_activate:code'
+importSite:
+- 'dw_prepare_site_import:default'
+- 'dw_compress:site'
+- 'dw_upload:site'
+- 'dw_import:site'
+initSite:
+- 'dw_prepare_site_import:init'
+- 'dw_compress:site'
+- 'dw_upload:site'
+- 'dw_import:site'
+initDemoSite:
+- 'dw_prepare_site_import:demo'
+- 'dw_compress:site'
+- 'dw_upload:site'
+- 'dw_import:site'
+importMeta:
+- 'dw_prepare_site_import:default'
+- 'dw_compress:meta'
+- 'dw_upload:meta'
+- 'dw_import:meta'
+importContent:
+- 'dw_bm_login'
+- 'dw_bm_ensure_no_import:content'
+- 'dw_bm_import_content'
+- 'dw_bm_checkprogress:content'
+exportUnits:
+- 'dw_bm_login'
+- 'dw_bm_export_units'
+- 'dw_bm_checkprogress:exportUnits'
+- 'dw_bm_download'
+triggerReindex:
+- 'dw_bm_login'
+- 'dw_bm_reindex'
+dist:
+- 'build'
+- 'upload'
+- 'activate'
+css:
+- 'sass:dev'
+- 'postcss:dev'
+watch:
+- 'css'
+- 'browserify:dev'
+- 'watch'
+default:
+- 'help'

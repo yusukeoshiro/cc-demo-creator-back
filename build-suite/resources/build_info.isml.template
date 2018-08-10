@@ -1,0 +1,80 @@
+<isscript>
+	var instanceType = dw.system.System.getInstanceType();
+	var production = dw.system.System.PRODUCTION_SYSTEM;
+	var staging = dw.system.System.STAGING_SYSTEM;
+</isscript>
+
+<isif condition="${instanceType != production}">
+	<div id="build_information" style="display : none; position: absolute; top:15px; left:170px; z-index: 999; background-color:#FFFFCC; padding:5px; border:1px solid #000000; width: 550px;">
+		<div class="close" style="width: 100%; text-align:right;"><a href="${'#'}" style="color: blue;" onclick="jQuery('${'#'}build_information').hide()">Close</a></div>
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td style="width: 200px;"  nowrap="nowrap">Build Time:</td>
+					<td width="100%">@BUILD_TIME@</td>
+				</tr>
+				<tr>
+					<td style="width: 200px;"  nowrap="nowrap">Built By:</td>
+					<td width="100%">@BUILT_BY@</td>
+				</tr>
+				<tr>
+					<td style="width: 200px;"  nowrap="nowrap">Project Name:</td>
+					<td width="100%">@DEPLOYMENT_PROJECT@</td>
+				</tr>
+				<tr>
+					<td style="width: 200px;"  nowrap="nowrap">Code Version:</td>
+					<td width="100%">@DEPLOYMENT_VERSION@</td>
+				</tr>
+				<tr>
+					<td style="width: 200px;"  nowrap="nowrap">Revision:</td>
+					<td width="100%">@REVISION@</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	
+	<script type="text/javascript">
+		var debugDW = {
+			count: 0,
+			
+			//Initializes Debug info display
+			init: function() {
+				//Check if there's a Storefront Toolkit iframe
+				var iframe = jQuery('${'#'}DW-SFToolkit');
+				if(!iframe.length)
+					return false;
+				
+				//Check for control menu inside iframe
+				var menu = iframe.contents().find('${'#'}dw-sf-control-menu ul');
+				if (!menu.length)
+						return false;
+				
+				//Create "Debug info" menu button
+				var menubtn = jQuery('<li class="x-menu-list-item " id="buil_listitem"><a href="${'#'}" class="x-menu-item" id="build-anchor"><img class="x-menu-item-icon dw-sf-control-menu-log" src="/on/demandware.static/Sites-Site/-/-/internal/images/s.gif">Build Information</a></li>');
+				
+				//Add click event to show debug info
+				menubtn.on('click', function() { 
+						jQuery('${'#'}build_information').show(); 
+					});
+
+				//Append menu button
+				menu.append(menubtn);
+				
+				return true;
+			},
+			
+			//Try to find iframe/SF-Toolkit DOM with a 250ms delay, try 10 times
+			triggerInit: function() {
+				var self = this;
+				
+				if(!this.init() && this.count < 10) {
+					window.setTimeout(function(){ self.triggerInit() }, 250);
+					this.count++;
+				}
+			}
+		};
+
+		debugDW.triggerInit();
+	</script>
+</isif>

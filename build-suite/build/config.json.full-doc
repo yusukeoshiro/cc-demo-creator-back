@@ -1,0 +1,220 @@
+/**
+ * Annotated config.json for documentation purpose
+ *
+ * Do not use this file as config.json directly since json is not intended to contain any comments!
+ * See config.json.full-sample if you want to use a template.
+ *
+ * Properties not listed in config.json.min-doc and the sample are to be considered as optional. 
+ * This file shows the default values for all optional settings.
+ *
+ * If you need to change properties via command line, use placeholders which can be replaced with values
+ * injected via command line. Example:
+ *  
+ * console command: 
+ *      grunt gruntTask --argName=argValue
+ *
+ * config: {
+ *  ...
+ *  "configOptionName": "${argName}"
+ *  ...
+ * }
+ *
+ */
+{
+  /** List of repositories to include in your build. */
+  "dependencies": [
+    {
+      "repository": {
+        /** Repository URL, e.g. https://example.com/repo, file://C:/myProjectFolder, ../myProjectFolder */
+        "url": "git@bitbucket.org:demandware/sitegenesis.git",
+        
+        /** Repository type: git, svn, file */
+        "type": "git",
+        
+        /** In case a CVS is used, specify the desired branch here. Defaults to master/trunk. */
+        "branch" : "master",
+        
+        /** Only for HTTPS: Authentication credentials */
+        "username": "anonymous",
+        "password": "secure"
+      },
+
+      "source": {
+        /** Cartridge folder, this is where the cartridges are pulled from 
+          * NOTE: Defaults to "cartridges"! Use "." if your cartridges are located in root folder. 
+          */
+        "path": "cartridges",
+        
+        /** 
+         * Optional. Set a globbing pattern for source files. 
+         * See also: http://gruntjs.com/configuring-tasks#globbing-patterns 
+         */
+        "glob": "**/*",
+        
+        /** Set this to true if you want to suppress "empty source folder" warnings */
+        "ignoreEmpty": false
+      },
+
+      /** NPM scripts to be called during build */
+      "npm": {
+        /** Run npm install for every build (enabled per default) */
+        "install": true,
+
+        /** List of scripts to run. Scripts will be called using "npm run {scriptname}" */
+        "scripts": [
+          "compile:js",
+          "compile:scss",
+          "compile:fonts"
+        ]
+      },
+
+      "siteImport": {
+        /** Site import for each repository is enabled by default */  
+        "enabled": "true",
+        
+        /** Optional: Provide a list of sites to be imported. (Default: import all sites.) */
+        "sites": ["SiteGenesis", "SiteGenesisGlobal"],
+        
+        /** Optional: Path where site initialization (configuration) data is placed. Displayed value is the default. */
+        "initPath": "sites/site_template",
+        
+        /** Additional path for demo data. */
+        "demoPath": "sites/site_demo",
+        
+        /** Optional: Path where instance-specific replacements are configured. See "targetInstance" setting below. */
+        "environmentPath": "sites/config"
+      },
+      /**
+       * List of included cartridges represented by their folder names. 
+       * (Default: copy all subfolders of cartridge root) 
+       */
+      "cartridges": [
+        "app_storefront_core"
+      ]
+    }
+  ],
+
+  /** 
+   * List of target environments, use identifiers to choose target with --target parameter 
+   * 
+   * Set default environment in `settings.general.target_environment`.
+   * If only one configured, it will automatically be used as default.
+   */
+  "environments": {
+    "sample": {
+      /** Environment settings: Server URL, username, password */
+      "server": "staging.<server>.demandware.net",
+      "username": "build",
+      "password": "secure",
+
+      /**
+       * OCAPI credentials
+       *  - If present, Code activation + Site import will utilize Data API
+       *  - Please refer to the OCAPI section in the readme.
+       */
+      "client_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "client_secret": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",   
+    
+      /**
+       * Two-factor-auth settings
+       *  - additional cert URL is needed for WebDAV if enabled
+       *  - password is the certificate secret
+       *  - certificate file path is relative to build suite root (can be absolute too)
+       */
+      "two_factor": {
+        "enabled": "false",
+        "cert": "certs/cert.p12",
+        "password": "secure",
+        "url": "cert.staging.<server>.demandware.net"
+      }
+    }
+  },
+    
+  "settings": {
+    /**
+     * Project settings: Project name (optoinal), code version name, version number (optional)
+     * Code version will be named "[version]-[build]", e.g. "build-suite-sample-version-0_0_1"
+     */
+    "project": {
+      "name":    "sample-project",
+      "version": "build-suite-sample-version",
+      "build":   "0_0_1"
+    },
+
+    /**
+     * General settings: Configure path for watch task, disable password encryption, define default target environment.
+     * Complete block is optional, below settings show defaults.
+     */
+    "general": {
+      "watch_path": '../cartridges',
+      "password_encryption": true,
+      "target_environment": "sample"
+    },
+  
+    /**
+     * Configure upload settings: Zip file cleanup after upload, cartridge-based zip files vs. global one.
+     * Hidden files are not excluded per default.
+     * Complete block is optional, below settings show defaults.
+     */  
+    "upload": {
+      "cleanup": true,
+      "excludehidden": false
+    },
+    
+    /**
+     * Settings for CSS/JS optimization enable/disable minification and concatenation.
+     * Since we support NPM frontend builds, postcss and browserify can be opted-out too.
+     */
+    "optimize": {
+      "postcss": true,
+      "browserify": true,
+      "js": true,
+      "css": true,
+      "concatenate": true
+    },
+
+    /**
+     * Site import configuration. Whole block is optional, site import disabled per default
+     *   - init/meta setting: Provide the desired file names
+     *   - content file must exist on server
+     */
+    "siteImport": {
+      "enabled": false,                                                
+      "filenames": {
+        "init": "build-suite-site-template",
+        "meta": "build-suite-metadata",
+        "content": "previously-uploaded-content-archive" 
+      }
+    },
+    
+    /**
+     * Site export feature. Configure sites that are exported. Block is optional.
+     */  
+    "siteExport": {
+      "sites": ["SiteGenesis", "SiteGenesisGlobal"]
+    },
+        
+    /** 
+     * SASS settings, values below are used as default. Please note the required folder structure:
+     *  - "cartridge/<sourcePath>/[locale]/<sourceFile>" will map to "cartridge/static/[locale]/css/<sourceFile>.css"
+     *  - E.g. cartridge/scss/en_US/style.scss => cartridge/static/en_US/css/style.css 
+     *
+     * Complete block is optional, below settings show defaults.
+     */
+    "sass": {
+      "enabled": true,
+      "sourcePath": "scss",
+      "sourceFile": "style.scss"
+    },
+ 
+    /**
+     * Configure Storefront Toolkit build information. Needed for template/cartridge adjustments.
+     * Complete block is optional, below settings show defaults.
+     */    
+    "storefront_build_information": {
+      "enabled": true,
+      "target_cartridge": "app_storefront_core",
+      "target_template": "default/components/footer/footer.isml"
+    }
+  }
+}

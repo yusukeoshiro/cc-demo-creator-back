@@ -1,0 +1,58 @@
+{
+  "dependencies": [
+    {
+      "repository": {
+        "url": "git@bitbucket.org:demandware/storefront-reference-architecture.git",
+        "type": "git"
+      },
+      "source": {
+        "path": "cartridges"
+      },
+      "npm": {
+        "install": true,
+        "scripts": [
+          "compile:js",
+          "compile:scss",
+          "compile:fonts"
+        ]
+      },
+      "cartridges": [
+        "app_storefront_base",
+        "modules"
+      ]
+    },
+    {
+      "repository": {
+        "url": "git@bitbucket.org:demandware/storefrontdata"
+      },
+      "siteImport": {
+        "enabled": "true",
+        "initPath": "demo_data_sfra"
+      }
+    }
+  ],
+
+  "environments": {
+    "sample": {
+      "server": "staging.<server>.dw.demandware.net",
+      "username": "builduser",
+      "password": "t8kdrXdL61E_ns9MZOAfHqw="   
+    }
+  },
+  
+  "settings": {
+    "siteImport": {
+      "enabled": "false"
+    },
+    "project": {
+      "version": "build-suite-sfra-sample"
+    },
+    "optimize": {
+      "postcss": false,
+      "browserify": false,
+      "js": false,
+      "css": false,
+      "concatenate": true
+    }
+  }
+}

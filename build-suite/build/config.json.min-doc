@@ -1,0 +1,40 @@
+/**
+ * Annotated minimum config.json for documentation purposes
+ *
+ * Do not use this file as config.json directly since json is not intended to contain any comments!
+ * If you want to use this as a template, please use some JS minifier or remove all comments manually.
+ *
+ * This file contains the mimimum neccessary configuration to be able to deploy with the build suite.
+ * 
+ * PLEASE NOTE: With this configuration, the default folder structure is expected. See Readme for details.
+ */
+{
+  /** In this list you can configure all kinds of repositories you want to include into the project. */
+  "dependencies": [
+    {
+      "repository": {
+        /** repository URL, e.g. https://example.com or file://c/myProjectFolder 
+         *  Please mind default repository structure, e.g. a "cartridges" folder is expected per default. 
+         */
+        "url": "git@bitbucket.org:demandware/sitegenesis.git",      
+      }
+    }
+  ],
+
+  /** List of Target environments */
+  "environments": {
+    "sample": {
+      /** Server settings: URL, username, password */
+      "server": "staging.<server>.dw.demandware.net",
+      "username": "build",
+      "password": "secure"
+    }
+  },
+  
+  "settings": {
+    /** We need at least the version name for naming the code version. */
+    "project": {
+      "version": "build-suite-sample-version"
+    }
+  }
+}

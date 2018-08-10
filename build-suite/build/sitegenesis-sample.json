@@ -1,0 +1,37 @@
+{
+  "dependencies": [
+    {
+      "repository": {
+        "url": "git@bitbucket.org:demandware/sitegenesis.git/",
+        "type": "git"
+      },
+      "source": {
+        "path": ".",
+        "glob": "**/*"
+      },
+      "siteImport": {
+        "enabled": "true",
+        "demoPath": "demo_data_no_hires_images"
+      },
+      "cartridges": [
+        "app_storefront_core",
+        "app_storefront_controllers",
+        "app_storefront_pipelines"
+      ]
+    }
+  ],
+
+  "environments": {
+    "sitegenesis": {
+      "server": "staging.<server>.dw.demandware.net",
+      "username": "builduser",
+      "password": "secret"   
+    }
+  },
+  
+  "settings": {
+    "project": {
+      "version": "build-suite-sitegenesis-sample"
+    }
+  }
+}
