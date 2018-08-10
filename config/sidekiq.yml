@@ -1,0 +1,8 @@
+production:
+  :concurrency: 2
+staging:
+  :concurrency: 3
+development:
+  :concurrency: 3
+# Set timeout to 8 on Heroku, longer if you manage your own systems.
+:timeout: 8
