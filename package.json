@@ -1,5 +1,1 @@
-{
-    "scripts": {
-        "postinstall": "cd build-suite && npm install"
-    }
-}
+{}
