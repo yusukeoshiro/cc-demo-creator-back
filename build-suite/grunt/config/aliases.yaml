@@ -61,3 +61,7 @@ watch:
 - 'watch'
 default:
 - 'help'
+catalogPopulate:
+- 'dw_compress:site'
+- 'dw_upload:site'
+- 'dw_import:site'

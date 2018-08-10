@@ -1,0 +1,29 @@
+{
+    "dependencies": [
+        {
+            "repository": {
+                "url": "https://github.com/yusukeoshiro/sitegenesis.git",
+                "type": "git"
+            }
+        }
+    ],
+
+    "environments": {
+        "sitegenesis": {
+            "server": "<%=HOST>",
+            "username": "<%=USER_NAME>",
+            "password": "<%=PASSWORD>"
+        }
+    },
+
+    "settings": {
+        "project": {
+            "version": "REPLACE"
+        },
+        "siteImport": {
+            "filenames": {
+                "init": "cc-demo-creator"
+            }
+        }
+    }
+}

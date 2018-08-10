@@ -27,7 +27,7 @@
     "grunt-log": "^1.0.0",
     "grunt-npm-command": "^0.1.2",
     "grunt-postcss": "^0.6.0",
-    "grunt-sass": "^2.0.0",
+    "grunt-sass": "^2.1.0",
     "grunt-svn-fetch": "^1.0.0",
     "grunt-text-replace": "^0.4.0",
     "grunt-xmlpoke": "^0.10.0",
