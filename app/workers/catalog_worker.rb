@@ -19,6 +19,7 @@ class CatalogWorker
 
 
     def perform(payload)
+        host_name = payload["catalog"]["host"]
         catalog_id = payload["catalog"]["id"]
         catalog_name = payload["catalog"]["name"]
         bm_user_name = payload["catalog"]["bmUserName"]
@@ -154,11 +155,13 @@ class CatalogWorker
 
 
                     end
-
+                end
+                products.each do | product |
                     # repeat for category assignments
                     xml.CategoryAssignment("category-id" => product["category"], "product-id" => product["id"]) do
                         xml.PrimaryFlag true
                     end
+
                 end
             end
         end
@@ -167,6 +170,25 @@ class CatalogWorker
             blob = replace_camel b.to_xml
             file.write blob
         end
+
+        # STEP 3.
+        # move the folder to build suite and execute build suite
+        buildsuite_output_path = "build-suite/output/UNNAMED/site_import/cc-demo-creator/catalogs"
+        FileUtils.rm_rf('build-suite/output')
+        FileUtils::mkdir_p buildsuite_output_path
+        FileUtils.cp_r catalog_path, buildsuite_output_path
+
+        # rewrite config.json
+        config = File.read('config.json')
+        config.gsub!("<%=HOST>", host_name)
+        config.gsub!("<%=USER_NAME>", bm_user_name)
+        config.gsub!("<%=PASSWORD>", bm_password)
+
+        File.open( "build-suite/build/config.json", 'w') do |file|
+            file.write config
+        end
+
+        puts %x( cd build-suite && grunt catalogPopulate ) # run the custom task called catalogPopulate
 
 
 
