@@ -3,8 +3,10 @@ Rails.application.routes.draw do
 
     namespace 'api' do
         namespace 'v1' do
-            post 'catalog', :to => "catalog#submit"
+            post 'catalog', :to => 'catalog#submit'
+            get  'env',     :to => 'misc#env'
         end
+
     end
 
 end
