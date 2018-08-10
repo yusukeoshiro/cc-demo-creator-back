@@ -1,0 +1,94 @@
+{
+  "dependencies": [
+    {
+      "repository": {
+        "url": "git@bitbucket.org:demandware/sitegenesis.git",
+        "type": "git",
+        "branch" : "master",
+        "username": "anonymous",
+        "password": "secure"
+      },
+      "source": {
+        "path": "cartridges",
+        "glob": "**/*",
+        "ignoreEmpty": false
+      },
+      "npm": {
+        "install": true,
+        "scripts": [
+          "build",
+          "lint"
+        ]
+      },
+      "siteImport": {
+        "enabled": "true",
+        "sites": ["SiteGenesis", "SiteGenesisGlobal"],
+        "initPath": "sites/site_template",
+        "demoPath": "sites/site_demo",
+        "environmentPath": "sites/config"
+      },
+      "cartridges": [
+        "app_storefront_core"
+      ]
+    }
+  ],
+
+  "environments": {
+    "sample": {
+      "server": "staging.<server>.demandware.net",
+      "username": "build",
+      "password": "secure",
+      "client_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "client_secret": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      
+      "two_factor": {
+        "enabled": "false",
+        "cert": "~/.secure/cert.p12",
+        "password": "secure",
+        "url": "cert.staging.<server>.demandware.net"
+      }
+    }
+  },
+  
+  "settings": {
+    "project": {
+      "name":    "sample-project",
+      "version": "build-suite-sample-version",
+      "build":   "0_0_1"
+    },
+    "general": {
+      "watch_path": "../cartridges",
+      "password_encryption": true,
+      "target_environment": "default"
+    },
+    "upload": {
+      "cleanup": true,
+      "excludehidden": false
+    },
+    "optimize": {
+      "js": true,
+      "css": true,
+      "concatenate": true
+    },
+    "siteImport": {
+      "enabled": true,                                                
+      "filenames": {
+        "init": "build-suite-site-template",
+        "meta": "build-suite-metadata",
+        "content": "previously-uploaded-content-archive" 
+      }
+    },
+    "siteExport": {
+      "sites": ["SiteGenesis", "SiteGenesisGlobal"]
+    },
+    "sass": {
+      "sourcePath": "scss",
+      "sourceFile": "style.scss"
+    },
+    "storefront_build_information": {
+      "enabled": true,
+      "target_cartridge": "app_storefront_core",
+      "target_template": "default/components/footer/footer.isml"
+    }
+  }
+}

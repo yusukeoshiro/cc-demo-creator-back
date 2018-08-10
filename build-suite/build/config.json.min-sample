@@ -1,0 +1,23 @@
+{
+  "dependencies": [
+    {
+      "repository": {
+        "url": "git@bitbucket.org:me/myrepository.git"
+      }
+    }
+  ],
+  
+  "environments": {
+    "sample": {
+      "server": "staging.<server>.dw.demandware.net",
+      "username": "build",
+      "password": "secure"
+    }
+  },
+  
+  "settings": {
+    "project": {
+      "version": "build-suite-sample-version"
+    }
+  }
+}

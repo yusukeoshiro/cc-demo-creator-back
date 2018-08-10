@@ -1,0 +1,15 @@
+image: node:6.9.4
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - node
+        script: 
+          # Lint Build Suite Code
+          - npm install eslint
+          - ./node_modules/.bin/eslint ./grunt/
+          # Check if NPM installs correctly
+          - npm install
+          # Run SG sample build
+          - ./node_modules/.bin/grunt build --project=sitegenesis-sample
