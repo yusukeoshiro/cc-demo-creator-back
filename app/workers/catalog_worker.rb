@@ -200,7 +200,7 @@ class CatalogWorker
                     }
                 ],
                 :from => {
-                    :email => email
+                    :email => "noreply@ccdemocreator.io"
                 },
                 :content => [
                     {
