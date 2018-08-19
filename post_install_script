@@ -1,0 +1,86 @@
+#!/bin/bash
+
+clear
+echo "=================================================="
+echo "=================================================="
+echo "=================================================="
+echo "=========== RUNNING CUSTOM BUILD SCRIPT!  ========"
+echo "=================================================="
+echo "=================================================="
+
+
+BUILD_PATH="$(pwd)"
+INIT_TCL_PATH=""
+BUILD_SUITE_URL="git@github.com:yusukeoshiro/build-suite.git"
+
+mkdir ~/.ssh
+
+# check if this is build process
+if [[ ${PWD} = "/tmp/"* ]]; then
+    echo "---build process---"
+    INIT_TCL_PATH="$(find /tmp -name init.tcl | head -1)"
+elif [[ ${PWD} = "/app"* ]]; then
+    echo "---NOT build process---"
+    INIT_TCL_PATH="$(find /app/.apt -name init.tcl | head -1)"
+else
+    echo "not triggered in heroku exitting now..."
+    exit 0
+fi
+
+export TCL_LIBRARY=$(dirname $INIT_TCL_PATH )
+echo "===== TCL_LIBRARY is set to: "${TCL_LIBRARY}
+
+
+if [ -z ${GITHUB_PRIVATE_KEY} ]; then
+    echo "===== Error: GITHUB_PRIVATE_KEY is not set. Exiting now."
+    exit 1
+else
+    echo "${GITHUB_PRIVATE_KEY}" > mykey
+fi
+
+echo "mykey is created with github private key..."
+
+
+
+eval `ssh-agent -s` && ssh-keyscan github.com >> ~/.ssh/known_hosts
+echo "===== ssh-agent is started and github.com is added to known hosts..."
+
+cat <<-EOEXP | expect -
+    set timeout 3
+    spawn ssh-add mykey
+    expect {
+        "Enter passphrase for" {
+          send "\r"
+        }
+    }
+    expect {
+        "denied" {
+            exit 1
+        }
+        eof {
+            exit 0
+        }
+    }
+EOEXP
+
+
+
+echo "===== cloning build suite from: " $BUILD_SUITE_URL
+git clone $BUILD_SUITE_URL
+cd build-suite
+
+echo "===== npm install..."
+npm install
+echo "===== npm install complete..."
+
+
+
+
+cd $BUILD_PATH
+cat alias_dot_yaml_extension >> build-suite/grunt/config/aliases.yaml
+echo "===== modifying the aliases.yaml with the file \"alias_dot_yaml_extension\"..."
+
+
+
+echo "===== build complete!"
+exit 0

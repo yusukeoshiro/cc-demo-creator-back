@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "postinstall": "cd build-suite && npm install"
+        "postinstall": "./post_install_script"
     },
     "dependencies": {
         "grunt-cli": "^1.2.0"
