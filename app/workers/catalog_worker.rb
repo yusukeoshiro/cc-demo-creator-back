@@ -24,6 +24,7 @@ class CatalogWorker
         catalog_name = payload["catalog"]["name"]
         bm_user_name = payload["catalog"]["bmUserName"]
         bm_password = payload["catalog"]["bmPassword"]
+        email = payload["catalog"]["email"]
 
         categories = payload["catalog"]["categories"]
         images = payload["catalog"]["images"]
@@ -188,9 +189,36 @@ class CatalogWorker
             file.write config
         end
 
-        puts %x( cd build-suite && grunt catalogPopulate ) # run the custom task called catalogPopulate
+        result = %x( cd build-suite && grunt catalogPopulate ) # run the custom task called catalogPopulate
 
-
+        if email.present?
+            data = {
+                :personalizations => [
+                    {
+                        :to => [ :email => email ],
+                        :subject => 'cc demo creator - build result: ' + DateTime.now.to_s
+                    }
+                ],
+                :from => {
+                    :email => email
+                },
+                :content => [
+                    {
+                        :type => "text/plain",
+                        :value => result
+                    }
+                ]
+            }
+            sg = SendGrid::API.new(api_key: ENV['SENDGRID_API_KEY'])
+            response = sg.client.mail._("send").post(request_body: data)
+            if response.status_code.to_i >= 300
+                p response.status_code
+                p response.body
+                p response.headers
+                raise "sendgrid send failed"
+            end
+        end
+        puts result
 
     end
 
