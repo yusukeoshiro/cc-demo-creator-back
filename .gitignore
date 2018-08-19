@@ -26,3 +26,5 @@
 dump.rdb
 .DS_Store
 node_modules
+mykey
+build-suite
