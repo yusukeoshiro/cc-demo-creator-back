@@ -11,35 +11,43 @@ echo "=================================================="
 
 BUILD_PATH="$(pwd)"
 INIT_TCL_PATH=""
+SET_INIT_TCL_PATH=false
 BUILD_SUITE_URL="git@github.com:yusukeoshiro/build-suite.git"
+
 
 mkdir ~/.ssh
 
-# check if this is build process
 if [[ ${PWD} = "/tmp/"* ]]; then
     echo "---build process---"
     INIT_TCL_PATH="$(find /tmp -name init.tcl | head -1)"
+    SET_INIT_TCL_PATH=true
 elif [[ ${PWD} = "/app"* ]]; then
     echo "---NOT build process---"
     INIT_TCL_PATH="$(find /app/.apt -name init.tcl | head -1)"
-else
-    echo "not triggered in heroku exitting now..."
-    exit 0
+    SET_INIT_TCL_PATH=true
 fi
 
-export TCL_LIBRARY=$(dirname $INIT_TCL_PATH )
-echo "===== TCL_LIBRARY is set to: "${TCL_LIBRARY}
+
+if $SET_INIT_TCL_PATH; then
+    export TCL_LIBRARY=$(dirname $INIT_TCL_PATH )
+    echo "===== TCL_LIBRARY is set to: "${TCL_LIBRARY}
+fi
+
 
 
 if [ -z ${GITHUB_PRIVATE_KEY} ]; then
-    echo "===== Error: GITHUB_PRIVATE_KEY is not set. Exiting now."
-    exit 1
+    if [ -s mykey ]
+        then
+            echo "mykeya already exists..."
+    else
+        echo "===== Error: GITHUB_PRIVATE_KEY is not set. Exiting now."
+        exit 1
+    fi
 else
     echo "${GITHUB_PRIVATE_KEY}" > mykey
 fi
 
 echo "mykey is created with github private key..."
-
 
 
 eval `ssh-agent -s` && ssh-keyscan github.com >> ~/.ssh/known_hosts
