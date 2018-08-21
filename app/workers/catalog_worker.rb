@@ -25,13 +25,24 @@ class CatalogWorker
         bm_user_name = payload["catalog"]["bmUserName"]
         bm_password = payload["catalog"]["bmPassword"]
         email = payload["catalog"]["email"]
+        site_id = payload["catalog"]["siteAssignment"] || ""
+        rebuild_search_index = site_id.present? ? payload["catalog"]["rebuildSearchIndex"] : false
+
+        p "================"
+        p "rebuild search index: #{rebuild_search_index}"
 
         categories = payload["catalog"]["categories"]
         images = payload["catalog"]["images"]
         products = payload["catalog"]["products"]
 
-        FileUtils.rm_rf('tmp/output')
-        catalog_path = "tmp/output/catalogs/#{catalog_id}"
+
+        output_path = 'tmp/output'
+        catalog_path = "#{output_path}/catalogs/#{catalog_id}"
+        site_path    = "#{output_path}/sites/#{site_id}" if site_id.present?
+
+        FileUtils.rm_rf( output_path )
+
+
 
 
         # STEP 1.
@@ -173,11 +184,42 @@ class CatalogWorker
         end
 
         # STEP 3.
+        # create site preference
+        if site_id.present?
+            FileUtils::mkdir_p site_path
+
+            b = Nokogiri::XML::Builder.new do |xml|
+                xml.preferences( "xmlns"=>"http://www.demandware.com/xml/impex/preferences/2007-03-31" ) do
+                    xml.StandardPreferences do
+                        xml.AllInstances do
+                            xml.preference({"preference-id" => "SiteCatalog"}, catalog_id)
+                        end
+                    end
+                end
+            end
+
+
+            File.open( site_path + "/preferences.xml", 'w') do |file|
+                blob = replace_camel b.to_xml
+                file.write blob
+            end
+        end
+
+
+        # STEP 4.
         # move the folder to build suite and execute build suite
-        buildsuite_output_path = "build-suite/output/UNNAMED/site_import/cc-demo-creator/catalogs"
+        buildsuite_output_path = "build-suite/output/UNNAMED/site_import/cc-demo-creator"
         FileUtils.rm_rf('build-suite/output')
         FileUtils::mkdir_p buildsuite_output_path
-        FileUtils.cp_r catalog_path, buildsuite_output_path
+
+        Dir.glob("tmp/output/*").each do |directory|
+            FileUtils.cp_r directory , buildsuite_output_path
+        end
+
+
+        # FileUtils.cp_r output_path+"/catalogs" , buildsuite_output_path
+        # FileUtils.cp_r output_path+"/sites" , buildsuite_output_path
+        # FileUtils.cp_r site_path, buildsuite_output_path
 
         # rewrite config.json
         config = File.read('config.json')
@@ -189,9 +231,19 @@ class CatalogWorker
             file.write config
         end
 
+
         result = %x( cd build-suite && grunt catalogPopulate ) # run the custom task called catalogPopulate
 
-        if email.present?
+        puts result
+
+        if rebuild_search_index
+            result = result + %x( grunt triggerReindex ) # run catalog reindex
+        end
+
+        puts result
+
+
+        if email.present? && email != ""
             data = {
                 :personalizations => [
                     {
@@ -229,7 +281,7 @@ class CatalogWorker
             DisplayName PageAttributes AttributeGroups AttributeGroup
             CustomAttributes CustomAttribute ImageGroup TaxClassId SearchableFlag AvailableFlag OnlineFrom OnlineFlag MinOrderQuantity
             CategoryAssignment PrimaryFlag ClassificationCategory PinterestEnabledFlag FacebookEnabledFlag
-            StepQuantity ManufacturerName ManufacturerSku)
+            StepQuantity ManufacturerName ManufacturerSku StandardPreferences AllInstances )
         replacements.each do |replacement|
             input.gsub!(replacement, replacement.to_kebab)
         end
