@@ -108,12 +108,18 @@ class CatalogWorker
                     xml.OnlineFlag true
                     xml.template
                     xml.PageAttributes
-                    # xml.AttributeGroups do
-                    #     xml.AttributeGroup("group-id" => "REPLACE") do
-                    #         xml.DisplayName({"xml:lang"=>"x-default"}, "REPLACE")
-                    #         xml.attribute("attribute-id"=>"REPLACE", "system"=>false)
-                    #     end
-                    # end
+
+                    xml.CustomAttributes do
+                        xml.CustomAttribute({"attribute-id"=>"enableCompare"}, false)
+                        xml.CustomAttribute({"attribute-id"=>"showInMenu"}, true)
+                    end
+                    xml.RefinementDefinitions do
+                        xml.RefinementDefinition({"type" => "category", "bucket-type" => "none"}) do
+                            xml.SortMode "value-name"
+                            xml.SortDirection "ascending"
+                            xml.CutoffThreshold 5
+                        end
+                    end
                 end
 
                 # repeat for any categories
@@ -125,6 +131,18 @@ class CatalogWorker
                         xml.Parent category["parent"]
                         xml.template
                         xml.PageAttributes
+                        xml.CustomAttributes do
+                            xml.CustomAttribute({"attribute-id"=>"enableCompare"}, false)
+                            xml.CustomAttribute({"attribute-id"=>"showInMenu"}, true)
+                        end
+                        xml.RefinementDefinitions do
+                            xml.RefinementDefinition({"type" => "category", "bucket-type" => "none"}) do
+                                xml.SortMode "value-name"
+                                xml.SortDirection "ascending"
+                                xml.CutoffThreshold 5
+                            end
+                        end
+
                         # xml.AttributeGroups do
                         #     xml.AttributeGroup("group-id" => "REPLACE") do
                         #         xml.DisplayName({"xml:lang"=>"x-default"}, "REPLACE")
@@ -142,6 +160,7 @@ class CatalogWorker
                         xml.unit
                         xml.MinOrderQuantity 1
                         xml.StepQuantity 1
+                        xml.DisplayName({"xml:lang"=>"x-default"}, product["name"])
                         xml.OnlineFlag true
                         xml.AvailableFlag true
                         xml.SearchableFlag true
@@ -345,7 +364,8 @@ class CatalogWorker
             CustomAttributes CustomAttribute ImageGroup TaxClassId SearchableFlag AvailableFlag OnlineFrom OnlineFlag MinOrderQuantity
             CategoryAssignment PrimaryFlag ClassificationCategory PinterestEnabledFlag FacebookEnabledFlag
             StepQuantity ManufacturerName ManufacturerSku StandardPreferences AllInstances DisplayName PriceTables PriceTable
-            InventoryList DefaultInstock UseBundleInventoryOnly OnOrder )
+            InventoryList DefaultInstock UseBundleInventoryOnly OnOrder
+            RefinementDefinitions RefinementDefinition SortMode SortDirection CutoffThreshold)
         replacements.each do |replacement|
             input.gsub!("<#{replacement}", "<#{replacement.to_kebab}")
             input.gsub!("</#{replacement}", "</#{replacement.to_kebab}")
