@@ -21,6 +21,9 @@ class CatalogWorker
     def perform(payload)
         host_name = payload["catalog"]["host"]
         catalog_id = payload["catalog"]["id"]
+        pricebook_id = catalog_id + "-pricebook"
+        inventory_id = catalog_id + "-inventory"
+        pricebook_currency = payload["catalog"]["pricebookCurrency"]
         catalog_name = payload["catalog"]["name"]
         bm_user_name = payload["catalog"]["bmUserName"]
         bm_password = payload["catalog"]["bmPassword"]
@@ -28,8 +31,6 @@ class CatalogWorker
         site_id = payload["catalog"]["siteAssignment"] || ""
         rebuild_search_index = site_id.present? ? payload["catalog"]["rebuildSearchIndex"] : false
 
-        p "================"
-        p "rebuild search index: #{rebuild_search_index}"
 
         categories = payload["catalog"]["categories"]
         images = payload["catalog"]["images"]
@@ -38,6 +39,8 @@ class CatalogWorker
 
         output_path = 'tmp/output'
         catalog_path = "#{output_path}/catalogs/#{catalog_id}"
+        pricebook_path = "#{output_path}/pricebooks"
+        inventory_path = "#{output_path}/inventory-lists"
         site_path    = "#{output_path}/sites/#{site_id}" if site_id.present?
 
         FileUtils.rm_rf( output_path )
@@ -193,6 +196,8 @@ class CatalogWorker
                     xml.StandardPreferences do
                         xml.AllInstances do
                             xml.preference({"preference-id" => "SiteCatalog"}, catalog_id)
+                            xml.preference({"preference-id" => "SiteInventoryList"}, inventory_id )
+                            xml.preference({"preference-id" => "SitePriceBooks"}, pricebook_id )
                         end
                     end
                 end
@@ -207,6 +212,66 @@ class CatalogWorker
 
 
         # STEP 4.
+        # create pricebook
+        FileUtils::mkdir_p pricebook_path
+
+        b = Nokogiri::XML::Builder.new do |xml|
+            xml.pricebooks( "xmlns"=>"http://www.demandware.com/xml/impex/pricebook/2006-10-31" ) do
+
+                xml.pricebook do
+                    xml.header({"pricebook-id" => pricebook_id }) do
+                        xml.currency pricebook_currency
+                        xml.DisplayName({"xml:lang" => "x-default"}, pricebook_id)
+                        xml.OnlineFlag true
+                    end
+                    xml.PriceTables do
+                        products.each do | product |
+                            xml.PriceTable({"product-id" => product["id"]}) do
+                                xml.amount({"quantity" => 1}, product["price"])
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        File.open( pricebook_path + "/#{pricebook_id}.xml", 'w') do |file|
+            blob = replace_camel b.to_xml
+            file.write blob
+        end
+
+
+
+
+        # STEP 5
+        # create inventory
+        FileUtils::mkdir_p inventory_path
+
+        b = Nokogiri::XML::Builder.new do |xml|
+            xml.inventory( "xmlns"=>"http://www.demandware.com/xml/impex/inventory/2007-05-31" ) do
+
+                xml.InventoryList do
+                    xml.header({ "list-id" => inventory_id}) do
+                        xml.DefaultInstock true
+                        xml.description "Created by CC Demo Creator"
+                        xml.UseBundleInventoryOnly false
+                        xml.OnOrder false
+                    end
+                end
+
+
+            end
+        end
+
+        File.open( inventory_path + "/#{inventory_id}.xml", 'w') do |file|
+            blob = replace_camel b.to_xml
+            file.write blob
+        end
+
+
+
+
+        # STEP 4.
         # move the folder to build suite and execute build suite
         buildsuite_output_path = "build-suite/output/UNNAMED/site_import/cc-demo-creator"
         FileUtils.rm_rf('build-suite/output')
@@ -215,11 +280,6 @@ class CatalogWorker
         Dir.glob("tmp/output/*").each do |directory|
             FileUtils.cp_r directory , buildsuite_output_path
         end
-
-
-        # FileUtils.cp_r output_path+"/catalogs" , buildsuite_output_path
-        # FileUtils.cp_r output_path+"/sites" , buildsuite_output_path
-        # FileUtils.cp_r site_path, buildsuite_output_path
 
         # rewrite config.json
         config = File.read('config.json')
@@ -231,14 +291,17 @@ class CatalogWorker
             file.write config
         end
 
-
-        result = %x( cd build-suite && grunt catalogPopulate ) # run the custom task called catalogPopulate
+        result = %x( cd #{Rails.root.to_s + "/build-suite"} && grunt catalogPopulate ) # run the custom task called catalogPopulate
 
         puts result
+        p "data import complete..."
 
         if rebuild_search_index
-            result = result + %x( grunt triggerReindex ) # run catalog reindex
+            p "now rebuilding the search index. this could take a while..."
+            result = result + %x( cd #{Rails.root.to_s + "/build-suite"} && grunt triggerReindex ) # run catalog reindex
         end
+
+
 
         puts result
 
@@ -281,9 +344,11 @@ class CatalogWorker
             DisplayName PageAttributes AttributeGroups AttributeGroup
             CustomAttributes CustomAttribute ImageGroup TaxClassId SearchableFlag AvailableFlag OnlineFrom OnlineFlag MinOrderQuantity
             CategoryAssignment PrimaryFlag ClassificationCategory PinterestEnabledFlag FacebookEnabledFlag
-            StepQuantity ManufacturerName ManufacturerSku StandardPreferences AllInstances )
+            StepQuantity ManufacturerName ManufacturerSku StandardPreferences AllInstances DisplayName PriceTables PriceTable
+            InventoryList DefaultInstock UseBundleInventoryOnly OnOrder )
         replacements.each do |replacement|
-            input.gsub!(replacement, replacement.to_kebab)
+            input.gsub!("<#{replacement}", "<#{replacement.to_kebab}")
+            input.gsub!("</#{replacement}", "</#{replacement.to_kebab}")
         end
         return input
     end
