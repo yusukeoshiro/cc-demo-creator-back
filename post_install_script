@@ -12,7 +12,13 @@ echo "=================================================="
 BUILD_PATH="$(pwd)"
 INIT_TCL_PATH=""
 SET_INIT_TCL_PATH=false
-BUILD_SUITE_URL="git@github.com:yusukeoshiro/build-suite.git"
+BUILD_SUITE_URL="${BUILD_SUITE_URL}"
+
+if [ -z ${BUILD_SUITE_URL} ]; then
+    echo "===== Error: BUILD_SUITE_URL is not set. Exiting now."
+    exit 1
+fi
+
 
 
 mkdir ~/.ssh
