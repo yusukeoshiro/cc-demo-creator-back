@@ -60,3 +60,7 @@ or
 $ bundle exec sidekiq # this is also fine
 ```
 ---
+
+## Front End
+Front end server should be spun up separately. Refer to this separate repository
+https://github.com/yusukeoshiro/cc-demo-creator-front
