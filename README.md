@@ -1,24 +1,61 @@
-# README
+# CC Demo Creator Back End Application
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Versions
 
-Things you may want to cover:
+```
+$ ruby -v
+ruby 2.4.1p111 (2017-03-22 revision 58053) [x86_64-darwin17]
 
-* Ruby version
+$ rails -v
+Rails 5.2.0
 
-* System dependencies
+$ redis-server -v
+Redis server v=4.0.9 sha=00000000:0 malloc=libc bits=64 build=e0c8d37381c486c6
+```
 
-* Configuration
 
-* Database creation
+---
 
-* Database initialization
+## Environment Variables
+When running the server on localhost, set the environment variable with `.env` located directly on the project root.
 
-* How to run the test suite
+```
+$ cat .env
+CLOUDINARY_URL=SOME_VALUE
+CLOUDINARY_UPLOAD_PRESET=SOME_VALUE
+DATABASE_URL=SOME_VALUE
+GITHUB_PRIVATE_KEY=SOME_VALUE
+REDIS_URL=SOME_VALUE
+GOOGLE_IMAGE_API_KEY=SOME_VALUE
+SENDGRID_API_KEY=SOME_VALUE
+SENDGRID_PASSWORD=SOME_VALUE
+SENDGRID_USERNAME=SOME_VALUE
+```
 
-* Services (job queues, cache servers, search engines, etc.)
 
-* Deployment instructions
+If you are running this app on Heroku, just run
 
-* ...
+`$ heroku config:set ENV_VAR_NAME="value"`
+
+---
+
+## Runnning the Servers
+
+
+### Web Server
+```
+$ bundle install # install dependencies
+$ rails db:create # install PG Database
+$ rails server # run the server
+```
+
+### Batch Server
+```
+$ # do all of the above
+$ bundle exec sidekiq -C config/sidekiq.yml
+
+or
+
+$ bundle exec sidekiq # this is also fine
+```
+---
