@@ -1,5 +1,6 @@
 # CC Demo Creator Back End Application
-last updated: 2018-08-24
+last updated: 2018-08-24  
+Heroku App: https://cc-demo-creator-front.herokuapp.com/
 
 ## Versions
 
@@ -34,8 +35,7 @@ SENDGRID_USERNAME=SOME_VALUE
 ```
 
 
-If you are running this app on Heroku, just run
-
+If you are running this app on Heroku, just run  
 `$ heroku config:set ENV_VAR_NAME="value"`
 
 ---
@@ -62,5 +62,5 @@ $ bundle exec sidekiq # this is also fine
 ---
 
 ## Front End
-Front end server should be spun up separately. Refer to this separate repository
+Front end server should be spun up separately. Refer to this separate repository  
 https://github.com/yusukeoshiro/cc-demo-creator-front
