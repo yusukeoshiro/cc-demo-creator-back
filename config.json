@@ -4,7 +4,22 @@
             "repository": {
                 "url": "https://github.com/yusukeoshiro/sitegenesis.git",
                 "type": "git"
-            }
+            },
+            "source": {
+                "path": "./",
+                "glob": "**/*"
+            },
+            "siteImport": {
+                "enabled": "true",
+                "sites": ["<%=SITEID>"],
+                "initPath": "sites/site_template",
+                "demoPath": "sites/site_demo",
+                "environmentPath": "sites/config"
+            },
+            "cartridges": [
+                "app_storefront_controllers",
+                "app_storefront_core"
+            ]
         }
     ],
 
@@ -18,12 +33,20 @@
 
     "settings": {
         "project": {
-            "version": "REPLACE"
+            "name":    "<%=SITEID>",
+            "version": "cc-demo-creator_version1"
         },
+
         "siteImport": {
+            "enabled": "true",
             "filenames": {
-                "init": "cc-demo-creator"
+                "init": "cc-demo-creator",
+                "meta": "meta"
             }
+        },
+
+        "siteExport": {
+            "sites": ["<%=SITEID>"]
         }
     }
 }

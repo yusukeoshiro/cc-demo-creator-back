@@ -7,8 +7,10 @@ Rails.application.routes.draw do
             get  'env',     :to => 'misc#env'
             post 'login',   :to => 'site#login'
             get  'sites',   :to => 'site#get_sites'
+
+            resources 'sites', only: [:create] do
+
+            end
         end
-
     end
-
 end
