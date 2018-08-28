@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [ -z ${GITHUB_PRIVATE_KEY} ]; then
+    if [ -s mykey ]
+        then
+            echo "mykeya already exists..."
+    else
+        echo "===== Error: GITHUB_PRIVATE_KEY is not set. Exiting now."
+        exit 1
+    fi
+else
+    echo "${GITHUB_PRIVATE_KEY}" > mykey
+fi
+
+echo "mykey is created with github private key..."
+
+
+eval `ssh-agent -s` && ssh-keyscan github.com >> ~/.ssh/known_hosts
+echo "===== ssh-agent is started and github.com is added to known hosts..."
+
+cat <<-EOEXP | expect -
+    set timeout 3
+    spawn ssh-add mykey
+    expect {
+        "Enter passphrase for" {
+          send "\r"
+        }
+    }
+    expect {
+        "denied" {
+            exit 1
+        }
+        eof {
+            exit 0
+        }
+    }
+EOEXP
