@@ -31,6 +31,7 @@ class SiteWorker
     puts 'End site worker!'
 
   rescue => e
+    puts 'Site worker error!'
     puts e
   end
 end
