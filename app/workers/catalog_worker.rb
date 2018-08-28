@@ -301,7 +301,7 @@ class CatalogWorker
         end
 
         # rewrite config.json
-        config = File.read('config.json')
+        config = File.read('config.catalog.json')
         config.gsub!("<%=HOST>", host_name)
         config.gsub!("<%=USER_NAME>", bm_user_name)
         config.gsub!("<%=PASSWORD>", bm_password)
