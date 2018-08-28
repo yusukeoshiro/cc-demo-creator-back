@@ -6,7 +6,6 @@ Rails.application.routes.draw do
             post 'catalog', :to => 'catalog#submit'
             get  'env',     :to => 'misc#env'
             post 'login',   :to => 'site#login'
-            get  'sites',   :to => 'site#get_sites'
 
             resources 'sites', only: [:create] do
 
