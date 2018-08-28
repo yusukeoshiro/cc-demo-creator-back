@@ -31,5 +31,8 @@ class SiteWorker
     site.upload_import_data
     
     puts 'End site worker!'
+
+  rescue => e
+    puts e
   end
 end
