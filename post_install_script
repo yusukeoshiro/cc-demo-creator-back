@@ -13,6 +13,7 @@ BUILD_PATH="$(pwd)"
 INIT_TCL_PATH=""
 SET_INIT_TCL_PATH=false
 BUILD_SUITE_URL="${BUILD_SUITE_URL}"
+SITEGENESIS_URL="${SITEGENESIS_URL}"
 
 if [ -z ${BUILD_SUITE_URL} ]; then
     echo "===== Error: BUILD_SUITE_URL is not set. Exiting now."
@@ -80,6 +81,7 @@ EOEXP
 
 
 echo "===== cloning build suite from: " $BUILD_SUITE_URL
+git clone $SITEGENESIS_URL
 git clone $BUILD_SUITE_URL
 cd build-suite
 
