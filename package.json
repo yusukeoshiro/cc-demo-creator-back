@@ -3,6 +3,7 @@
         "postinstall": "./post_install_script"
     },
     "dependencies": {
+        "fs-extra": "^7.0.0",
         "grunt-cli": "^1.2.0"
     }
 }

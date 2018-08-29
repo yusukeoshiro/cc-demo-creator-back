@@ -14,19 +14,50 @@ class SiteWorker
       default_currency: payload['siteDetail']['defaultCurrency'],
       allowed_currencies: payload['siteDetail']['allowedCurrencies'],
       main_color: payload['siteDetail']['mainColor'],
-      logo_url: payload['siteDetail']['brandLogoUrl']
+      logo_url: payload['siteDetail']['brandLogoUrl'],
+      email: payload['siteDetail']['email']
     )
 
     return if !site.valid?
 
     # following is not good bacause it need to keep order
     # will refactoring
-    site.set_config
+    site.pre_build
     site.run_build
     site.create_import_data
     site.copy_import_data
     site.upload_code_and_active
     site.upload_import_data
+    site.rebuild_index
+    site.remove_import_data_dir
+
+    if site.email.present? && ENV['SENDGRID_API_KEY']
+      data = {
+        :personalizations => [
+          {
+            :to => [ :email => site.email ],
+            :subject => 'cc demo creator - build result: ' + DateTime.now.to_s
+          }
+        ],
+        :from => {
+          :email => "noreply@ccdemocreator.io"
+        },
+        :content => [
+          {
+            :type => "text/plain",
+            :value => site.result_message
+          }
+        ]
+      }
+      sg = SendGrid::API.new(api_key: ENV['SENDGRID_API_KEY'])
+      response = sg.client.mail._("send").post(request_body: data)
+      if response.status_code.to_i >= 300
+        p response.status_code
+        p response.body
+        p response.headers
+        raise "sendgrid send failed"
+      end
+    end
     
     puts 'End site worker!'
 

@@ -1,7 +1,7 @@
 class Site
   include ActiveModel::Model
 
-  attr_accessor :host, :user, :password, :site_id, :site_name, :default_locale, :default_currency, :allowed_currencies, :main_color, :logo_url
+  attr_accessor :host, :user, :password, :site_id, :site_name, :default_locale, :default_currency, :allowed_currencies, :main_color, :logo_url, :email
 
   with_options presence: true do
     validates :host
@@ -13,34 +13,57 @@ class Site
     validates :allowed_currencies
   end
 
+  def pre_build
+    set_config
+    output_create_site_exports_js
+  end
+
   def set_config 
     config = File.read('config.json')
     config.gsub!("<%=HOST>", host)
     config.gsub!("<%=USER_NAME>", user)
     config.gsub!("<%=PASSWORD>", password)
     config.gsub!("<%=SITEID>", site_id)
-    # config.gsub!("<%=SITENAME>", site_name)
     File.open( "build-suite/build/config.json", 'w') { |file| file.write config }
   end
 
+  # example
+  # run_build_suite_command { 'siteBuild' }
+  def run_build_suite_command
+    return unless block_given?
+
+    result = %x("cd #{build_suite_path} && grunt #{yield}")
+    add_messages(result)
+  end
+
   def run_build
-    result = %x( cd #{Rails.root.to_s}/build-suite && grunt build )
-    puts result
+    puts 'Start grunt siteBuild!'
+    result = %x( cd #{build_suite_path} && grunt siteBuild )
+    add_messages(result)
   end
 
   def copy_import_data 
-    result = %x( cd #{Rails.root.to_s}/build-suite && grunt dw_copy )
-    puts result
+    puts 'Start copy site data'
+    result = %x( cd #{build_suite_path} && grunt dw_copy )
+    add_messages(result)
   end
 
   def upload_code_and_active
-    result = %x( cd #{Rails.root.to_s}/build-suite && grunt upload && grunt activate )
-    puts result
+    puts 'Start upload code and active!'
+    result = %x( cd #{build_suite_path} && grunt upload && grunt activate )
+    add_messages(result)
   end
 
   def upload_import_data
-    result = %x( cd #{Rails.root.to_s}/build-suite && grunt initSite )
-    puts result
+    puts 'Start upload site data!'
+    result = %x( cd #{build_suite_path} && grunt initSite )
+    add_messages(result)
+  end
+
+  def rebuild_index
+    puts 'now rebuilding the search index. this could take a while...'
+    result = %x( cd #{build_suite_path} && grunt triggerReindex )
+    add_messages(result)
   end
 
   def create_import_data
@@ -87,18 +110,52 @@ class Site
     File.write(css_path, css)
   end
 
+  def result_message
+    @log_messages.join
+  end
+
+  def remove_import_data_dir
+    FileUtils.rm_rf(["#{build_suite_path}/exports", "#{build_suite_path}/output"])
+  end
+
+  def output_create_site_exports_js
+    output_js = <<-"JSON"
+      'use strict';
+      
+      var fs = require('fs-extra');
+      
+      module.exports = function (grunt) {
+          grunt.registerMultiTask('dw_copy_sitegenesis', 'Create dir to export the site from storefront at root.', function () {
+              var dependencies = grunt.config('dependencies'),
+                  checkoutpath = grunt.config('dw_properties').folders.repos + dependencies[0].id;
+              
+              grunt.log.writeln(' -- Starting copy to ' + checkoutpath + ' form ../sitegenesis');
+      
+              fs.mkdirsSync(checkoutpath);
+              fs.copySync('../sitegenesis', checkoutpath);
+          });
+      };
+    JSON
+
+    File.write('build-suite/grunt/tasks/dw_create_site_exports.js', output_js)
+  end
+
   private
 
   def build_suite_path
-    @build_suite_path ||= "#{Rails.root.to_s}/build-suite/exports/#{site_id}/sitegenesis"
+    @build_suite_path ||= "#{Rails.root.to_s}/build-suite"
+  end
+
+  def export_sitegenesis_path
+    @export_sitegenesis_path ||= "#{build_suite_path}/exports/#{site_id}/sitegenesis"
   end
 
   def base
-    @base ||= "#{build_suite_path}/demo_data_no_hires_images"
+    @base ||= "#{export_sitegenesis_path}/demo_data_no_hires_images"
   end
 
   def dest
-    @dest ||= "#{build_suite_path}/sites/site_template"
+    @dest ||= "#{export_sitegenesis_path}/sites/site_template"
   end
 
   def base_custom_object
@@ -139,5 +196,12 @@ class Site
 
   def css_path
     "#{build_suite_path}/app_storefront_core/cartridge/scss/default/_variables.scss"
+  end
+
+  def add_messages(message)
+    @log_messages ||= []
+    @log_messages << message
+    puts message
+    @log_messages
   end
 end
