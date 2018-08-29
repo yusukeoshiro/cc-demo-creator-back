@@ -15,7 +15,7 @@ class Site
 
   def pre_build
     set_config
-    output_create_site_exports_js
+    output_copy_sitegenesis_js
   end
 
   def set_config 
@@ -118,7 +118,7 @@ class Site
     FileUtils.rm_rf(["#{build_suite_path}/exports", "#{build_suite_path}/output"])
   end
 
-  def output_create_site_exports_js
+  def output_copy_sitegenesis_js
     output_js = <<-"JSON"
       'use strict';
       
@@ -137,7 +137,17 @@ class Site
       };
     JSON
 
-    File.write('build-suite/grunt/tasks/dw_create_site_exports.js', output_js)
+    output_config = <<-"JSON"
+      module.exports = {
+          options: {
+          },
+          default: {
+          }
+      };
+    JSON
+     
+    File.write('build-suite/grunt/tasks/dw_copy_sitegenesis.js', output_js)
+    File.write('build-suite/grunt/config/dw_copy_sitegenesis.js', output_config)
   end
 
   private
