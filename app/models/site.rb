@@ -19,7 +19,7 @@ class Site
   end
 
   def set_config
-    config = File.read('config.json')
+    config = File.read('config.site.json')
     config.gsub!("<%=HOST>", host)
     config.gsub!("<%=USER_NAME>", user)
     config.gsub!("<%=PASSWORD>", password)
