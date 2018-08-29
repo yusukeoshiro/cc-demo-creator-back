@@ -15,7 +15,8 @@ class SiteWorker
       allowed_currencies: payload['siteDetail']['allowedCurrencies'],
       main_color: payload['siteDetail']['mainColor'],
       logo_url: payload['siteDetail']['brandLogoUrl'],
-      email: payload['siteDetail']['email']
+      email: payload['siteDetail']['email'],
+      rebuild_search_index: payload['siteDetail']['isRebuildSearchIndex']
     )
 
     return if !site.valid?
@@ -28,7 +29,7 @@ class SiteWorker
     site.copy_import_data
     site.upload_code_and_active
     site.upload_import_data
-    site.rebuild_index
+    site.rebuild_index if site.rebuild_search_index
     site.remove_import_data_dir
 
     if site.email.present? && ENV['SENDGRID_API_KEY']
@@ -58,7 +59,7 @@ class SiteWorker
         raise "sendgrid send failed"
       end
     end
-    
+
     puts 'End site worker!'
 
   rescue => e

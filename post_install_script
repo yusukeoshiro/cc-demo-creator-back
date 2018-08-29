@@ -20,6 +20,11 @@ if [ -z ${BUILD_SUITE_URL} ]; then
     exit 1
 fi
 
+if [ -z ${SITEGENESIS_URL} ]; then
+    echo "===== Error: SITEGENESIS_URL is not set. Exiting now."
+    exit 1
+fi
+
 
 
 mkdir ~/.ssh

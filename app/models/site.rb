@@ -1,7 +1,7 @@
 class Site
   include ActiveModel::Model
 
-  attr_accessor :host, :user, :password, :site_id, :site_name, :default_locale, :default_currency, :allowed_currencies, :main_color, :logo_url, :email
+  attr_accessor :host, :user, :password, :site_id, :site_name, :default_locale, :default_currency, :allowed_currencies, :main_color, :logo_url, :email, :rebuild_search_index
 
   with_options presence: true do
     validates :host
@@ -18,7 +18,7 @@ class Site
     output_copy_sitegenesis_js
   end
 
-  def set_config 
+  def set_config
     config = File.read('config.json')
     config.gsub!("<%=HOST>", host)
     config.gsub!("<%=USER_NAME>", user)
@@ -42,7 +42,7 @@ class Site
     add_messages(result)
   end
 
-  def copy_import_data 
+  def copy_import_data
     puts 'Start copy site data'
     result = %x( cd #{build_suite_path} && grunt dw_copy )
     add_messages(result)
@@ -72,7 +72,7 @@ class Site
     FileUtils.mv(Dir.glob(base_meta), dest_meta)
     FileUtils.mv(Dir.glob(base_libraries), dest_libraries)
     FileUtils.mv(Dir.glob(base_sites), dest_sites)
-    
+
     replace_shared_library
     replace_site
     replace_preferences
@@ -121,16 +121,16 @@ class Site
   def output_copy_sitegenesis_js
     output_js = <<-"JSON"
       'use strict';
-      
+
       var fs = require('fs-extra');
-      
+
       module.exports = function (grunt) {
           grunt.registerMultiTask('dw_copy_sitegenesis', 'Create dir to export the site from storefront at root.', function () {
               var dependencies = grunt.config('dependencies'),
                   checkoutpath = grunt.config('dw_properties').folders.repos + dependencies[0].id;
-              
+
               grunt.log.writeln(' -- Starting copy to ' + checkoutpath + ' form ../sitegenesis');
-      
+
               fs.mkdirsSync(checkoutpath);
               fs.copySync('../sitegenesis', checkoutpath);
           });
@@ -145,7 +145,7 @@ class Site
           }
       };
     JSON
-     
+
     File.write('build-suite/grunt/tasks/dw_copy_sitegenesis.js', output_js)
     File.write('build-suite/grunt/config/dw_copy_sitegenesis.js', output_config)
   end
