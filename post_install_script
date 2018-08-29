@@ -83,10 +83,11 @@ cat <<-EOEXP | expect -
     }
 EOEXP
 
+echo "===== cloning sitegenesis from: " $SITEGENESIS_URL
+git clone $SITEGENESIS_URL
 
 
 echo "===== cloning build suite from: " $BUILD_SUITE_URL
-git clone $SITEGENESIS_URL
 git clone $BUILD_SUITE_URL
 cd build-suite
 
@@ -98,7 +99,7 @@ echo "===== npm install complete..."
 
 
 cd $BUILD_PATH
-cat alias_dot_yaml_extension >> build-suite/grunt/config/aliases.yaml
+cat build-suite-config/alias_dot_yaml_extension >> build-suite/grunt/config/aliases.yaml
 echo "===== modifying the aliases.yaml with the file \"alias_dot_yaml_extension\"..."
 
 
