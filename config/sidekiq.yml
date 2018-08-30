@@ -1,5 +1,5 @@
 production:
-  :concurrency: 1
+  :concurrency: 1 # only 1 job is allowed concurrently!
 staging:
   :concurrency: 1
 development:
