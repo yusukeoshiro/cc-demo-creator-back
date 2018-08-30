@@ -59,6 +59,11 @@ If you are running this app on Heroku, just run
 
 ---
 
+## Heroku Buildpacks
+* https://github.com/heroku/heroku-buildpack-apt
+* heroku/nodejs
+* heroku/ruby
+
 ## Runnning the Servers
 
 
