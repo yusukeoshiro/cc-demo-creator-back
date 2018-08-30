@@ -19,10 +19,8 @@ class SiteWorker
       rebuild_search_index: payload['siteDetail']['isRebuildSearchIndex']
     )
 
-    return if !site.valid?
+    raise 'invalid parameter!' if !site.valid?
 
-    # following is not good bacause it need to keep order
-    # will refactoring
     site.pre_build
     site.run_build
     site.create_import_data

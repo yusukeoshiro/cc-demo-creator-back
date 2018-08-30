@@ -40,6 +40,7 @@ When running the server on localhost, set the environment variable with `.env` l
 ```
 $ cat .env
 BUILD_SUITE_URL=SOME_VALUE
+SITEGENESIS_URL=SOME_VALUE
 CLOUDINARY_URL=SOME_VALUE
 CLOUDINARY_UPLOAD_PRESET=SOME_VALUE
 DATABASE_URL=SOME_VALUE
@@ -51,7 +52,7 @@ SENDGRID_PASSWORD=SOME_VALUE
 SENDGRID_USERNAME=SOME_VALUE
 ```
 
-note: BUILD_SUITE_URL should be something like git@github.com:xxxx/build-suite.git
+note: BUILD_SUITE_URL and SITEGENESIS_URL should be something like git@github.com:xxxx/xxxx.git
 
 If you are running this app on Heroku, just run  
 `$ heroku config:set ENV_VAR_NAME="value"`

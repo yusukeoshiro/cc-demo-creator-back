@@ -8,10 +8,7 @@ Rails.application.routes.draw do
             post 'login',   :to => 'sites#login'
             get  'sites',   :to => 'sites#get_sites'
 
-
-            resources 'sites', only: [:create] do
-
-            end
+            resources 'sites', only: [:create]
         end
     end
 end
