@@ -11,7 +11,7 @@ gem 'nokogiri'
 gem 'sidekiq'
 gem 'cloudinary'
 gem 'sendgrid-ruby'
-
+gem 'settingslogic'
 
 group :development, :test do
     gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
